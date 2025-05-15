@@ -209,10 +209,10 @@ static int cgwb_debug_stats_show(struct seq_file *m, void *v)
 		collect_wb_stats(&stats, wb);
 
 		/*
-		 * Calculate thresh of wb in writeback cgroup which is min of
-		 * thresh in global domain and thresh in cgroup domain. Drop
-		 * rcu lock because cgwb_calc_thresh may sleep in
-		 * cgroup_rstat_flush. We can do so here because we have a ref.
+		 * Compute writeback threshold for cgroup-backed wb instance.
+		 * Since cgwb_calc_thresh may sleep (via cgroup_rstat_flush),
+		 * drop the RCU read lock temporarily. This is safe because
+		 * we hold a reference to the wb, preventing it from being freed.
 		 */
 		if (mem_cgroup_wb_domain(wb)) {
 			rcu_read_unlock();
